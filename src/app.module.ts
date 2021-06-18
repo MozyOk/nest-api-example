@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmConfigService } from './config/typeorm-config.service';
 import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    UsersModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      port: 3306,
-      database: 'nest_api_development',
-      host: 'localhost',
-      username: 'root',
-      password: '',
-      synchronize: true,
-      entities: [__dirname + '/**/*.entity.{js,ts}'],
+    ConfigModule.forRoot({
+      envFilePath: [`.env/${process.env.NODE_ENV}.env`, '.env/default.env'],
+      isGlobal: true,
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: TypeOrmConfigService,
+    }),
+    UsersModule,
   ],
 })
 export class AppModule {}
