@@ -7,7 +7,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { UserPropertyDto } from './dto/user-property.dto';
+import { UserStatusPipe } from './pipe/user-status.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -22,7 +26,9 @@ export class UsersController {
   }
 
   @Post()
-  createUser(@Body('name') name: string, @Body('desc') desc: string) {
+  @UsePipes(ValidationPipe)
+  createUser(@Body() userPropertyDto: UserPropertyDto) {
+    const { name, desc } = userPropertyDto;
     return `createUser Success! Params [name:${name}, desc:${desc}]`;
   }
 
@@ -34,7 +40,7 @@ export class UsersController {
   @Patch('/:id')
   updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status') status: string,
+    @Body('status', UserStatusPipe) status: string,
   ) {
     return `updateUser Success! Params [id:${id}, status:${status}]`;
   }
